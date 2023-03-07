@@ -1,9 +1,14 @@
 {
     "authors": [
         {
-            "maintainer": true,
+            "maintainer": false,
             "name": "Markus Sattler",
             "url": "https://github.com/Links2004"
+        },
+        {
+            "maintainer": true,
+            "name": "Kurt Momberg",
+            "url": "https://github.com/kmomberg"
         }
     ],
     "description": "WebSocket Server and Client for Arduino based on RFC6455",
@@ -19,7 +24,7 @@
     "platforms": "atmelavr, espressif8266, espressif32",
     "repository": {
         "type": "git",
-        "url": "https://github.com/Links2004/arduinoWebSockets.git"
+        "url": "https://github.com/kmomberg/arduinoWebSockets.git"
     },
-    "version": "2.3.7"
+    "version": "2.3.8"
 }
