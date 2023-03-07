@@ -266,11 +266,10 @@ void WebSocketsClient::loop(void) {
         if(_client.tcp->connect(_host.c_str(), _port)) {
 #endif
             connectedCb();
-            _lastConnectionFail = 0;
         } else {
             connectFailedCb();
-            _lastConnectionFail = millis();
         }
+        _lastConnectionFail = millis();
     } else {
         handleClientData();
         WEBSOCKETS_YIELD();
@@ -844,13 +843,15 @@ void WebSocketsClient::connectedCb() {
     DEBUG_WEBSOCKETS("[WS-Client] connected to %s:%u.\n", _host.c_str(), _port);
 
 #if(WEBSOCKETS_NETWORK_TYPE == NETWORK_ESP8266_ASYNC)
-    _client.tcp->onDisconnect(std::bind([](WebSocketsClient * c, AsyncTCPbuffer * obj, WSclient_t * client) -> bool {
-        DEBUG_WEBSOCKETS("[WS-Server][%d] Disconnect client\n", client->num);
+    _client.tcp->onDisconnect(std::bind([&](WebSocketsClient * c, AsyncTCPbuffer * obj, WSclient_t * client) -> bool {
+        DEBUG_WEBSOCKETS("[WS-Client][%d] Disconnect client\n", client->num);
         client->status = WSC_NOT_CONNECTED;
         client->tcp    = NULL;
 
-        // reconnect
-        c->asyncConnect();
+        // reconnect disabled
+        // c->asyncConnect();
+        runCbEvent(WStype_DISCONNECTED, NULL, 0);
+
 
         return true;
     },
@@ -922,11 +923,12 @@ void WebSocketsClient::asyncConnect() {
     },
         this, std::placeholders::_2));
 
-    tcpclient->onError(std::bind([](WebSocketsClient * ws, AsyncClient * tcp) {
+    tcpclient->onError(std::bind([&](WebSocketsClient * ws, AsyncClient * tcp) {
         ws->connectFailedCb();
 
-        // reconnect
-        ws->asyncConnect();
+        // reconnect disabled
+        // ws->asyncConnect();
+        runCbEvent(WStype_ERROR, NULL, 0);
     },
         this, std::placeholders::_2));
 
